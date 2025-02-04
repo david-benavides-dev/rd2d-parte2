@@ -18,34 +18,34 @@ class Robot(private var nombre: String = "", private var serialrobot: Int) {
     init {
         if (nombre.isEmpty()) { obtenerNombre() }
         if (serialrobot !in 0..3) { obtenerNumeroSerie() }
-        cambiarPosicionesSerial()
+        establecerPosicionesTipo()
     }
 
-    private fun cambiarPosicionesSerial() {
+    private fun establecerPosicionesTipo() {
         when (serialrobot) {
             // RD2D
             0 -> {
-                println("ROBOT TIPO R2D2 LISTO PARA LA ACCIÓN *BEP BEP*")
+                println("[R2D2] SISTEMA OPERATIVO CARGADO. ESTADO: ÓPTIMO. *BEEP BOOP*")
             }
             // DAW1A
             1 -> {
-                println("ROBOT TIPO DAW1A LISTO PARA LA ACCIÓN... MAS O MENOS")
                 posX = Random.nextInt(-5,5)
                 posY = 0
+                println("[DAW1A] INICIALIZANDO... COORDENADAS ESTABLECIDAS. ESTADO: FUNCIONAL... MÁS O MENOS.")
             }
             // DAW1B
             2 -> {
-                println("ROBOT DAW1B TERRRRRRRENEITORRRR READY")
                 posX = 0
                 posY = Random.nextInt(-10,10)
                 direccion = Direcciones.DIRECCIONES.random()
+                println("[DAW1B] *** MÓDULO DE MOVIMIENTO ACTIVADO *** PROCESANDO... *BEEP BOOP*")
             }
             // DAM1
             3 -> {
                 posX = Random.nextInt(-5,5)
                 posY = Random.nextInt(-5,5)
                 direccion = Direcciones.DIRECCIONES.random()
-                println("robot dam1 intentando iniciar")
+                println("[DAM1] *** ERROR PARCIAL *** INTENTANDO ARRANQUE... SISTEMA EN PROCESO DE RECUPERACIÓN...")
             }
         }
     }
@@ -67,13 +67,15 @@ class Robot(private var nombre: String = "", private var serialrobot: Int) {
 
     /**
      * Solicita al usuario que introduzca el número de serie del robot.
-     * El número debe estar entre 0 y 3.
-     * 0 -> R2D2 comienza en (0, 0) y PositiveY
-     * 1 -> DAW1A Comienza con posición aleatoria entre -5 y 5 para x y en el eje y en 0. Dirección PositiveX.
-     * 2 -> DAW1B comienza en la posición x = 0, pero la posición y es aleatoria entre -10 y 10. Dirección inicial aleatoria.
-     * 3 -> DAM1 comienza en una posición aleatoria entre -5 y 5 en cada eje. Dirección inicial aleatoria.
+     * El número debe estar entre 0 y 3, determinando el tipo y configuración inicial del robot.
      *
-     * @param pedirNumeroSerie El mensaje que se muestra al usuario para introducir el número de serie.
+     * **Opciones de número de serie:**
+     * - `0` → **R2D2**: Comienza en `(0, 0)` con dirección `PositiveY`.
+     * - `1` → **DAW1A**: Posición inicial aleatoria en `x` (`-5` a `5`), `y = 0`, dirección `PositiveX`.
+     * - `2` → **DAW1B**: Inicia en `x = 0`, `y` aleatoria entre `-10` y `10`, dirección inicial aleatoria.
+     * - `3` → **DAM1**: Posición inicial aleatoria en ambos ejes (`x` e `y` entre `-5` y `5`), dirección aleatoria.
+     *
+     * @param pedirNumeroSerie Mensaje mostrado al usuario para ingresar el número de serie del robot.
      */
     private fun obtenerNumeroSerie(pedirNumeroSerie: String = "Introduce el número de serie de $nombre >> ") {
         while (this.serialrobot !in 0..3) {
