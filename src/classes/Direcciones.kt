@@ -4,7 +4,8 @@ enum class Direcciones {
     PositiveX, NegativeX, PositiveY, NegativeY;
 
     companion object {
-        val DIRECCIONES = entries.toTypedArray()
-        val direccionRandom = Direcciones.DIRECCIONES.random()
+        fun obtenerDireccionRandom(): Direcciones {
+            return Direcciones.entries.random()
+        }
     }
 }

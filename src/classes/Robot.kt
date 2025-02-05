@@ -2,14 +2,17 @@ package classes
 import kotlin.random.Random
 
 /**
- * Clase que representa un robot con un sistema de coordenadas algo especialito
+ * Representa un robot con un sistema de coordenadas y diferentes tipos de comportamiento según su modelo.
  *
- * @property nombre El nombre del robot. Si está en blanco, se solicitará al usuario introducir uno.
- * @property posX La posición en el eje X del robot. Por defecto 0.
- * @property posY La posición en el eje Y del robot. Por defecto 0.
- * @property direccion La dirección en la que se mueve el robot. Por defecto es Direcciones.PositiveY.
+ * El robot puede ser de distintos modelos, cada uno con una configuración de inicio y un patrón de movimiento específico.
+ *
+ * @property nombre Nombre del robot. Si no se proporciona, se solicita al usuario.
+ * @property modeloRobot Número de modelo del robot. Si es inválido, se solicita al usuario.
+ * @property posX Coordenada X del robot.
+ * @property posY Coordenada Y del robot.
+ * @property direccion Dirección actual en la que se mueve el robot.
  */
-class Robot(private var nombre: String = "", private var serialrobot: Int) {
+class Robot(private var nombre: String = "", private var modeloRobot: Int = -1) {
 
     private var posX: Int = 0
     private var posY: Int = 0
@@ -17,35 +20,48 @@ class Robot(private var nombre: String = "", private var serialrobot: Int) {
 
     init {
         if (nombre.isEmpty()) { obtenerNombre() }
-        if (serialrobot !in 0..3) { obtenerNumeroSerie() }
+        if (modeloRobot !in 0..3) { obtenerModeloRobot() }
         establecerPosicionesTipo()
     }
 
+    /**
+     * Asigna las posiciones iniciales y dirección del robot según su modelo.
+     *
+     * Los diferentes modelos tienen condiciones iniciales específicas:
+     * - `0` (R2D2): Inicia en `(0, 0)`, dirección `PositiveY`.
+     * - `1` (DAW1A): Posición aleatoria en `x` dentro de `[-5, 5]`, `y = 0`.
+     * - `2` (DAW1B): `x = 0`, `y` aleatoria en `[-10, 10]`, dirección aleatoria.
+     * - `3` (DAM1): Posición aleatoria en ambos ejes `[-5, 5]`, dirección aleatoria.
+     */
     private fun establecerPosicionesTipo() {
-        when (serialrobot) {
+        when (modeloRobot) {
             // RD2D
             0 -> {
                 println("[R2D2] SISTEMA OPERATIVO CARGADO. ESTADO: ÓPTIMO. *BEEP BOOP*")
+                println("Estado inicial del robot: ($posX, $posY) - Dirección: $direccion")
             }
             // DAW1A
             1 -> {
                 posX = Random.nextInt(-5,5)
                 posY = 0
                 println("[DAW1A] INICIALIZANDO... COORDENADAS ESTABLECIDAS. ESTADO: FUNCIONAL... MÁS O MENOS.")
+                println("Estado inicial del robot: ($posX, $posY) - Dirección: $direccion")
             }
             // DAW1B
             2 -> {
                 posX = 0
                 posY = Random.nextInt(-10,10)
-                direccion = Direcciones.DIRECCIONES.random()
+                direccion = Direcciones.obtenerDireccionRandom()
                 println("[DAW1B] *** MÓDULO DE MOVIMIENTO ACTIVADO *** PROCESANDO... *BEEP BOOP*")
+                println("Estado inicial del robot: ($posX, $posY) - Dirección: $direccion")
             }
             // DAM1
             3 -> {
                 posX = Random.nextInt(-5,5)
                 posY = Random.nextInt(-5,5)
-                direccion = Direcciones.DIRECCIONES.random()
+                direccion = Direcciones.obtenerDireccionRandom()
                 println("[DAM1] *** ERROR PARCIAL *** INTENTANDO ARRANQUE... SISTEMA EN PROCESO DE RECUPERACIÓN...")
+                println("Estado inicial del robot: ($posX, $posY) - Dirección: $direccion")
             }
         }
     }
@@ -53,37 +69,43 @@ class Robot(private var nombre: String = "", private var serialrobot: Int) {
     /**
      * Solicita al usuario que introduzca el nombre del robot.
      *
-     * @param pedirName El mensaje que se muestra al usuario para introducir el nombre.
+     * @param pedirName El mensaje que se muestra al usuario a la hora de introducir el nombre.
      */
     private fun obtenerNombre(pedirName: String = "Introduce el nombre del robot >> ") {
         while (this.nombre.isBlank()) {
             print(pedirName)
             this.nombre = readln()
             if (this.nombre == "") {
-                println("*ERROR* El nombre del robotrón no puede estar vacío.")
+                println("*ERROR* El nombre del robot no puede estar vacío.")
             }
         }
     }
 
     /**
-     * Solicita al usuario que introduzca el número de serie del robot.
+     * Solicita al usuario que introduzca el modelo del robot.
      * El número debe estar entre 0 y 3, determinando el tipo y configuración inicial del robot.
      *
-     * **Opciones de número de serie:**
+     * **Diferentes modelos:**
      * - `0` → **R2D2**: Comienza en `(0, 0)` con dirección `PositiveY`.
      * - `1` → **DAW1A**: Posición inicial aleatoria en `x` (`-5` a `5`), `y = 0`, dirección `PositiveX`.
      * - `2` → **DAW1B**: Inicia en `x = 0`, `y` aleatoria entre `-10` y `10`, dirección inicial aleatoria.
      * - `3` → **DAM1**: Posición inicial aleatoria en ambos ejes (`x` e `y` entre `-5` y `5`), dirección aleatoria.
      *
-     * @param pedirNumeroSerie Mensaje mostrado al usuario para ingresar el número de serie del robot.
+     * @param pedirModelo Mensaje mostrado al usuario para ingresar el modelo del robot.
      */
-    private fun obtenerNumeroSerie(pedirNumeroSerie: String = "Introduce el número de serie de $nombre >> ") {
-        while (this.serialrobot !in 0..3) {
-            print(pedirNumeroSerie)
+    private fun obtenerModeloRobot(pedirModelo: String = "Introduce el número de modelo para el robot $nombre >> ") {
+        println("""
+            Modelo 0 -> RD2D
+            MODELO 1 -> DAW1A
+            MODELO 2 -> DAW1B
+            MODELO 3 -> DAM1
+        """.trimIndent())
+        while (this.modeloRobot !in 0..3) {
+            print(pedirModelo)
             try {
-                this.serialrobot = readln().toInt()
-                if(serialrobot !in 0..3) {
-                    println("*ERROR* Ese serial no existe.")
+                this.modeloRobot = readln().toInt()
+                if(modeloRobot !in 0..3) {
+                    println("*ERROR* Ese modelo no existe.")
                 }
             } catch (e: NumberFormatException) {
                 println("*ERROR* No has introducido un número.")
@@ -93,9 +115,6 @@ class Robot(private var nombre: String = "", private var serialrobot: Int) {
 
     /**
      * Mueve el robot en función de un array de movimientos y el tipo de robot que sea
-     *
-     * Cada movimiento se aplica en la dirección actual del robot, y luego se cambia la dirección
-     * en contra de las agujas del reloj.
      *
      * @param movimientos Un array de enteros que representa los movimientos a realizar.
      */
@@ -110,7 +129,7 @@ class Robot(private var nombre: String = "", private var serialrobot: Int) {
         //         NegativeY
 
         for (movimiento in movimientos) {
-            when(serialrobot) {
+            when(modeloRobot) {
                 0, 2 -> {
                     when(direccion) {
                         Direcciones.PositiveY -> {
@@ -139,7 +158,7 @@ class Robot(private var nombre: String = "", private var serialrobot: Int) {
                         }
                         Direcciones.NegativeX -> {
                             posX -= movimiento
-                            direccion = if (posX > 0) Direcciones.PositiveX else Direcciones.NegativeX
+                            direccion = if (posX > 0) Direcciones.PositiveX else Direcciones.PositiveY
                         }
                         Direcciones.NegativeY -> {
                             posY -= movimiento
@@ -147,7 +166,7 @@ class Robot(private var nombre: String = "", private var serialrobot: Int) {
                         }
                         Direcciones.PositiveX -> {
                             posX += movimiento
-                            direccion = if (posX > 0) Direcciones.PositiveX else Direcciones.NegativeX
+                            direccion = if (posX > 0) Direcciones.NegativeX else Direcciones.PositiveY
                         }
                     }
                 }
@@ -155,19 +174,19 @@ class Robot(private var nombre: String = "", private var serialrobot: Int) {
                     when(direccion) {
                         Direcciones.PositiveY -> {
                             posY += movimiento
-                            direccion = Direcciones.DIRECCIONES.filter { it != direccion }.random()
+                            direccion = generateSequence { Direcciones.obtenerDireccionRandom() }.first { it != direccion }
                         }
                         Direcciones.NegativeX -> {
                             posX -= movimiento
-                            direccion = Direcciones.DIRECCIONES.filter { it != direccion }.random()
+                            direccion = generateSequence { Direcciones.obtenerDireccionRandom() }.first { it != direccion }
                         }
                         Direcciones.NegativeY -> {
                             posY -= movimiento
-                            direccion = Direcciones.DIRECCIONES.filter { it != direccion }.random()
+                            direccion = generateSequence { Direcciones.obtenerDireccionRandom() }.first { it != direccion }
                         }
                         Direcciones.PositiveX -> {
                             posX += movimiento
-                            direccion = Direcciones.DIRECCIONES.filter { it != direccion }.random()
+                            direccion = generateSequence { Direcciones.obtenerDireccionRandom() }.first { it != direccion }
                         }
                     }
                 }
@@ -196,9 +215,9 @@ class Robot(private var nombre: String = "", private var serialrobot: Int) {
     /**
      * Devuelve una representación en forma de cadena del estado actual del robot.
      *
-     * @return Una cadena que describe la posición y dirección del robot.
+     * @return Una cadena que describe el nombre, posición, dirección y modelo del robot.
      */
     override fun toString(): String {
-        return "$nombre está en ${obtenerPosicion()} ${obtenerDireccion()}"
+        return "ROBOT [NOMBRE: $nombre MODELO: $modeloRobot] está en ${obtenerPosicion()} ${obtenerDireccion()}"
     }
 }
